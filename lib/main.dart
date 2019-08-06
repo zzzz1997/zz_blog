@@ -1,5 +1,6 @@
 import 'package:flutter_web/material.dart';
 
+import 'package:zz_blog/model/bloc_provider.dart';
 import 'package:zz_blog/page/home.dart';
 
 ///
@@ -16,12 +17,14 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return BlocProvider(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        // theme: ThemeData(
+        //   primarySwatch: Colors.blue,
+        // ),
+        home: HomePage(),
       ),
-      home: HomePage(),
     );
   }
 }

@@ -24,7 +24,7 @@ class Grid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width / fullSpan;
+    double width = Screen.realWidth / fullSpan;
     List<Row> rows = [];
     // 开始位置
     int index = 0;
@@ -71,7 +71,6 @@ class Grid extends StatelessWidget {
     if (gridItems == null || gridItems.isEmpty) {
       return -1;
     }
-    print(gridItems.length);
     int index;
     int span = 0;
     for (int i = 0; i < gridItems.length; i++) {

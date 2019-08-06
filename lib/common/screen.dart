@@ -18,15 +18,25 @@ enum ScreenSize {
 /// @created_time 20190805
 ///
 class Screen {
-
   // 屏幕大小
   static ScreenSize screenSize;
-  
+
+  // 宽度
+  static double width;
+
+  // 高度
+  static double height;
+
+  // 真实宽度
+  static double realWidth;
+
   ///
   /// 初始化
   ///
   static init(context) {
-    double width = MediaQuery.of(context).size.width;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
+    realWidth = width > 980 ? 980 : width;
     if (width < 768) {
       screenSize = ScreenSize.XS;
     } else if (width < 992) {
@@ -37,6 +47,6 @@ class Screen {
       screenSize = ScreenSize.LG;
     } else {
       screenSize = ScreenSize.XL;
-    } 
+    }
   }
 }
