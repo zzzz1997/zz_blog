@@ -1,6 +1,7 @@
 import 'package:flutter_web/material.dart';
 
 import 'package:zz_blog/common/screen.dart';
+import 'package:zz_blog/common/theme.dart';
 import 'package:zz_blog/model/bloc/main_bloc.dart';
 import 'package:zz_blog/model/bloc_provider.dart';
 import 'package:zz_blog/widget/grid.dart';
@@ -12,9 +13,8 @@ import 'package:zz_blog/widget/grid.dart';
 /// @created_time 20190805
 ///
 class HomePage extends StatelessWidget {
-
   // 标题
-  final List<String> _list = ['1', '2', '3'];
+  final List<String> _list = ['主页', '关于', '联系我', '登录'];
 
   @override
   Widget build(BuildContext context) {
@@ -24,48 +24,20 @@ class HomePage extends StatelessWidget {
     return StreamBuilder(
       stream: mainBloc.themeStream,
       builder: (_, __) => Theme(
-        data: mainBloc.themeData,
+        data: mainBloc.themeStyle.themeData,
         child: Scaffold(
-          backgroundColor: Color.fromARGB(255, 51, 51, 51),
-          body: Center(
+          backgroundColor: mainBloc.themeStyle.colors.background,
+          body: Align(
+            alignment: Alignment.topCenter,
             child: SizedBox(
               width: Screen.realWidth,
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: mainBloc.changeTheme,
-                          child: Text(
-                            'Hello, World!',
-                          ),
-                        ),
-                        StreamBuilder<int>(
-                          stream: mainBloc.indexStream,
-                          builder: (_, __) => Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: _list
-                                .map((l) => GestureDetector(
-                                      onTap: () {
-                                        mainBloc.setIndex(_list.indexOf(l));
-                                      },
-                                      child: Text(
-                                        l,
-                                        style: TextStyle(
-                                          color:
-                                              mainBloc.index == _list.indexOf(l)
-                                                  ? Colors.black
-                                                  : Colors.white,
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                          ),
-                        ),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: _buildNavigitor(mainBloc),
                     ),
                     Text(
                       'Hello, World!',
@@ -236,6 +208,126 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  ///
+  /// 构建导航栏
+  ///
+  Widget _buildNavigitor(MainBloc mainBloc) {
+    if (Screen.screenSize != ScreenSize.XS) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          _buildLogo(mainBloc),
+          StreamBuilder<List<int>>(
+            stream: mainBloc.indexsStream,
+            builder: (_, __) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: _list.map((l) {
+                int i = _list.indexOf(l);
+                return Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      mainBloc.setIndex(i);
+                    },
+                    child: Listener(
+                      onPointerEnter: (_) {
+                        mainBloc.setHoverIndex(i);
+                      },
+                      onPointerExit: (_) {
+                        mainBloc.removeHover();
+                      },
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: mainBloc.indexs[0] == i
+                              ? mainBloc.themeStyle.colors.navSelected
+                              : mainBloc.indexs[1] == i
+                                  ? mainBloc.themeStyle.colors.navHover
+                                  : mainBloc.themeStyle.colors.navNormal,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            _list[i],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return ExpansionPanelList(
+        children: <ExpansionPanel>[
+          ExpansionPanel(
+            isExpanded: true,
+            headerBuilder: (_, __) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                _buildLogo(mainBloc),
+                IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: _list.map((l) {
+                int i = _list.indexOf(l);
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: mainBloc.indexs[0] == i
+                        ? mainBloc.themeStyle.colors.navSelected
+                        : mainBloc.indexs[1] == i
+                            ? mainBloc.themeStyle.colors.navHover
+                            : mainBloc.themeStyle.colors.navNormal,
+                  ),
+                  child: ListTile(
+                    title: GestureDetector(
+                      onTap: () {
+                        mainBloc.setIndex(i);
+                      },
+                      child: Listener(
+                        onPointerEnter: (_) {
+                          mainBloc.setHoverIndex(i);
+                        },
+                        onPointerExit: (_) {
+                          mainBloc.removeHover();
+                        },
+                        child: Text(
+                          _list[i],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      );
+    }
+  }
+
+  ///
+  /// 构建logo布局
+  ///
+  Widget _buildLogo(MainBloc mainBloc) {
+    return GestureDetector(
+      onTap: mainBloc.changeTheme,
+      child: Text(
+        'zzBlog',
+        style: TextStyle(
+          fontSize: 32,
         ),
       ),
     );

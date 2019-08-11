@@ -1,6 +1,6 @@
-import 'package:flutter_web/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'package:zz_blog/common/theme.dart';
 import 'package:zz_blog/model/bloc/base_bloc.dart';
 
 ///
@@ -14,53 +14,73 @@ class MainBloc extends BaseBloc {
   static String tag = 'MainBloc';
 
   // 主题
-  ThemeData _themeData = ThemeData.dark();
+  ThemeStyle _themeStyle = ThemeStyle.dark();
 
   // 获取主题
-  ThemeData get themeData => _themeData;
+  ThemeStyle get themeStyle => _themeStyle;
 
   // 主题数据流
-  var _themeSubject = BehaviorSubject<ThemeData>();
+  var _themeSubject = BehaviorSubject<ThemeStyle>();
 
   // 获取主题数据流
-  Stream<ThemeData> get themeStream => _themeSubject.stream;
+  Stream<ThemeStyle> get themeStream => _themeSubject.stream;
 
-  // 位置
-  int _index = 0;
+  // 位置数组（第一个表示选中位置，第二个表示hover位置）
+  List<int> _indexs = [0, -1];
 
   // 获取位置
-  int get index => _index;
+  List<int> get indexs => _indexs;
 
   // 位置数据流
-  var _indexSubject = BehaviorSubject<int>();
+  var _indexsSubject = BehaviorSubject<List<int>>();
 
   // 获取位置数据流
-  Stream<int> get indexStream => _indexSubject.stream;
+  Stream<List<int>> get indexsStream => _indexsSubject.stream;
 
   ///
   /// 更换主题
   ///
   changeTheme() {
-    if (themeData == ThemeData.dark()) {
-      _themeData = ThemeData.light();
+    if (themeStyle.light) {
+      _themeStyle = ThemeStyle.dark();
     } else {
-      _themeData = ThemeData.dark();
+      _themeStyle = ThemeStyle.light();
     }
-    _themeSubject.add(themeData);
+    _themeSubject.add(themeStyle);
   }
 
   ///
   /// 设置位置
   ///
   setIndex(index) {
-    this._index = index;
-    _indexSubject.add(index);
+    if (_indexs[0] != index) {
+      _indexs[0] = index;
+      _indexsSubject.add(indexs);
+    }
+  }
+
+  ///
+  /// 设置hover位置
+  ///
+  setHoverIndex(index) {
+    if (!_indexs.every((i) => i == index)) {
+      _indexs[1] = index;
+      _indexsSubject.add(indexs);
+    }
+  }
+
+  ///
+  /// 移除hover
+  ///
+  removeHover() {
+    _indexs[1] = -1;
+    _indexsSubject.add(indexs);
   }
 
   ///
   /// 释放资源
   ///
   dispose() {
-    _indexSubject.close();
+    _indexsSubject.close();
   }
 }
